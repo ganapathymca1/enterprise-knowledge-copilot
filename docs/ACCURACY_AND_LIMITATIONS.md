@@ -13,9 +13,10 @@ python eval/run_eval.py                                  # offline, deterministi
 python eval/run_eval.py --provider openai_compatible     # with a real model
 ```
 
-Case mix: 26 single-document policy questions, 1 cross-document, 5 tool
-lookups, 3 multi-turn follow-ups, 4 unanswerable questions, 4 guardrail probes,
-1 access-control probe.
+Case mix: 28 specific-fact policy questions, 3 broad "summarise this area"
+questions, 1 cross-document question, 5 record-tool lookups, 3 multi-turn
+follow-ups, 4 unanswerable questions, 4 guardrail probes and 1 access-control
+probe.
 
 Recorded runs are committed under [`eval/results/`](../eval/results/).
 
@@ -78,7 +79,7 @@ labels to make the numbers look better.
 
 ### Corpus
 
-- **11 documents, 117 passages.** Retrieval numbers on a 100k-document corpus
+- **14 documents, 117 passages.** Retrieval numbers on a 100k-document corpus
   will be lower; hit@5 = 1.000 here says the pipeline is sound at this scale,
   not that it is solved.
 - **Synthetic and internally consistent.** A real handbook contains

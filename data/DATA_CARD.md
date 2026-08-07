@@ -8,12 +8,12 @@ personal data anywhere in the repo, and no protected health information (PHI).
 
 | Dataset | Path | Records | Nature |
 |---|---|---|---|
-| HR / operations knowledge base | `data/knowledge_base/*.md` | 11 policy documents | Synthetic, human-authored |
+| HR / operations knowledge base | `data/knowledge_base/*.md` | 14 policy documents (117 passages) | Synthetic, human-authored |
 | Employee directory | `data/hr_records/employees.csv` | 24 rows | Synthetic |
 | Leave balances | `data/hr_records/leave_balances.csv` | 96 rows | Synthetic |
 | Leave requests | `data/hr_records/leave_requests.csv` | 30 rows | Synthetic |
 | Holiday calendar | `data/hr_records/holidays.csv` | 42 rows | Synthetic, derived from public holiday names |
-| Evaluation set | `eval/golden_set.json` | 32 questions | Synthetic, hand-labelled |
+| Evaluation set | `eval/golden_set.json` | 49 labelled cases | Synthetic, hand-labelled |
 
 ## Why synthetic rather than a Kaggle/GitHub dump
 
@@ -62,7 +62,7 @@ audience: ...
 
 ## Known limitations of the data
 
-* The corpus is small (11 documents, ~250 chunks). Retrieval quality numbers in
+* The corpus is small (14 documents, 117 chunks). Retrieval quality numbers in
   `docs/ACCURACY_AND_LIMITATIONS.md` will not transfer unchanged to a corpus of
   100k documents.
 * Only English. No multilingual or localised policy variants.

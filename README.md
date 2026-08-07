@@ -253,7 +253,7 @@ backend/app/
   services/          orchestrator, guardrails, conversation, feedback store
 frontend/            index.html + css/ + js/ (no build step)
 data/
-  knowledge_base/    11 synthetic policy documents
+  knowledge_base/    14 synthetic policy documents
   hr_records/        synthetic employees, balances, requests, holidays
   DATA_CARD.md       provenance and limitations
 eval/                golden set, harness, recorded results

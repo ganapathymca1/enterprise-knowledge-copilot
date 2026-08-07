@@ -26,7 +26,7 @@
         │                    │                     │
         ▼                    ▼                     ▼
   data/knowledge_base   data/hr_records        LLM provider
-  11 markdown policies  4 CSV record sets      ollama | openai-compatible
+  14 markdown policies  4 CSV record sets      ollama | openai-compatible
   → 117 chunks          → 5 tools              | gemini | extractive
 ```
 
