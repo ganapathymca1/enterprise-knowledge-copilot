@@ -1,0 +1,23 @@
+# Enterprise Knowledge Copilot — pinned runtime dependencies.
+# Everything here is free and open source. No paid services are required.
+# Developed and verified on Python 3.14 (3.11+ supported).
+#
+# Pins below are the exact versions this solution was built and tested against.
+
+fastapi==0.134.0
+uvicorn[standard]==0.41.0
+pydantic==2.12.5
+pydantic-settings==2.13.1
+python-dotenv==1.2.1
+httpx==0.28.1
+
+# Retrieval stack — fully local, deterministic, no model weights to download.
+numpy==2.4.4
+scikit-learn==1.8.0
+
+# Optional LLM client, used for every OpenAI-compatible endpoint
+# (Ollama, Groq, LM Studio, OpenRouter, vLLM, OpenAI ...).
+openai==2.45.0
+
+# Tests
+pytest==9.0.2

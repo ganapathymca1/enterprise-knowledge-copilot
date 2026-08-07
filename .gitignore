@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Local secrets — never commit real keys
+.env
+.env.local
+
+# Runtime artifacts (index cache, feedback DB, logs)
+var/
+*.sqlite3
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
