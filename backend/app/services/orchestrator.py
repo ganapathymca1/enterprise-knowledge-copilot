@@ -67,9 +67,10 @@ MEDIUM_RELEVANCE = 0.28
 HIGH_GROUNDING = 0.80
 MEDIUM_GROUNDING = 0.55
 
-# Query-coverage bands used with the unknown-vocabulary check. Calibrated on
-# the evaluation set, where unsupported questions score at or below 0.16 and
-# answerable ones at or above 0.19 (see docs/ACCURACY_AND_LIMITATIONS.md).
+# Query-coverage bands. Calibrated on the evaluation set, where questions the
+# corpus cannot answer score at or below 0.16 and answerable ones at or above
+# 0.19 (see docs/ACCURACY_AND_LIMITATIONS.md). Below the first band the copilot
+# declines; between the two it answers with an explicit caution.
 ABSTAIN_COVERAGE = 0.20
 CAUTION_COVERAGE = 0.30
 
@@ -179,10 +180,13 @@ class Orchestrator:
         # when the question is mostly unfamiliar, caution when it is partly so.
         context.unknown_terms = self.index.unknown_terms(context.rewritten)
         top_coverage = max((item.coverage for item in context.scored), default=0.0)
-        if context.unknown_terms and not tool_succeeded:
+        if not tool_succeeded:
             if top_coverage < ABSTAIN_COVERAGE:
+                # Coverage alone decides: it is calibrated, bounded and
+                # comparable across queries. The unknown-term list is used only
+                # to *explain* the refusal when it happens to be available.
                 return await self._finalise_abstention(context, started)
-            if top_coverage < CAUTION_COVERAGE:
+            if context.unknown_terms and top_coverage < CAUTION_COVERAGE:
                 context.notices.append(_unknown_terms_notice(context.unknown_terms))
 
         # 5. Generation ---------------------------------------------------

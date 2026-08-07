@@ -134,6 +134,8 @@ def _morphological_variants(term: str) -> set[str]:
             variants.update({stem, f"{stem}e", f"{stem}s", f"{stem}y"})
     if term.endswith("ies") and len(term) > 4:
         variants.add(f"{term[:-3]}y")
+    if term.endswith("y") and len(term) > 3:
+        variants.add(f"{term[:-1]}ies")  # city -> cities
     return variants
 
 
