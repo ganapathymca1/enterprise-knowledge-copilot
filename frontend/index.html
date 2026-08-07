@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enterprise Knowledge Copilot</title>
+  <meta name="description" content="Grounded internal assistant for HR policies and employee records." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📘</text></svg>" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+  <a class="skip-link" href="#composer-input">Skip to the question box</a>
+
+  <div class="layout">
+    <!-- ---------------------------------------------------------------- -->
+    <aside class="sidebar" id="sidebar" aria-label="Copilot context">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">◆</span>
+        <div>
+          <h1>Knowledge Copilot</h1>
+          <p class="brand-sub">Northwind Systems · internal</p>
+        </div>
+      </div>
+
+      <section class="panel" aria-labelledby="identity-heading">
+        <h2 id="identity-heading">Acting as</h2>
+        <label class="visually-hidden" for="employee-select">Employee identity used for record lookups</label>
+        <select id="employee-select" class="select">
+          <option value="">Loading directory…</option>
+        </select>
+        <p class="hint">
+          Demo only. A production deployment takes identity from SSO and ignores the client.
+        </p>
+      </section>
+
+      <section class="panel" aria-labelledby="conversations-heading">
+        <div class="panel-head">
+          <h2 id="conversations-heading">Conversations</h2>
+          <button type="button" class="ghost-btn" id="new-chat">New</button>
+        </div>
+        <ul class="session-list" id="session-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="panel grow" aria-labelledby="corpus-heading">
+        <div class="panel-head">
+          <h2 id="corpus-heading">Knowledge base</h2>
+          <span class="pill" id="corpus-count">—</span>
+        </div>
+        <p class="hint">Everything the copilot can answer from. Anything else, it declines.</p>
+        <ul class="doc-list" id="doc-list"></ul>
+      </section>
+
+      <section class="panel status-panel" aria-labelledby="status-heading">
+        <h2 id="status-heading">Status</h2>
+        <p class="status-line">
+          <span class="dot" id="status-dot" aria-hidden="true"></span>
+          <span id="status-text">Checking…</span>
+        </p>
+        <p class="hint" id="status-note"></p>
+      </section>
+    </aside>
+
+    <!-- ---------------------------------------------------------------- -->
+    <main class="main" aria-labelledby="conversation-heading">
+      <h2 id="conversation-heading" class="visually-hidden">Conversation</h2>
+
+      <div class="transcript" id="transcript" role="log" aria-live="polite" aria-relevant="additions text" tabindex="0">
+        <section class="welcome" id="welcome">
+          <h3>Ask about HR policy, ways of working, or your own records.</h3>
+          <p>
+            Every answer is retrieved from published policy documents, cited, and checked
+            before you see it. If the knowledge base does not cover something, the copilot
+            says so instead of guessing.
+          </p>
+          <div class="examples" role="group" aria-label="Example questions">
+            <button type="button" class="example">Summarize our leave policy</button>
+            <button type="button" class="example">What is the escalation process for incidents?</button>
+            <button type="button" class="example">Find information about onboarding steps</button>
+            <button type="button" class="example">How many annual leave days do I have left?</button>
+            <button type="button" class="example">What are my next public holidays?</button>
+            <button type="button" class="example">How do I claim a home office allowance?</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="composer">
+        <form id="composer" autocomplete="off">
+          <label class="visually-hidden" for="composer-input">Your question</label>
+          <textarea
+            id="composer-input"
+            rows="1"
+            maxlength="1200"
+            placeholder="Ask about leave, onboarding, incidents, expenses, security…"
+            aria-describedby="composer-hint"
+          ></textarea>
+          <button type="submit" id="send-btn" class="send-btn">
+            <span id="send-label">Ask</span>
+          </button>
+        </form>
+        <p class="composer-foot" id="composer-hint">
+          <span>Enter to send · Shift+Enter for a new line</span>
+          <span id="char-count" aria-live="off">0 / 1200</span>
+        </p>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <template id="tpl-user-message">
+    <article class="msg msg-user">
+      <div class="msg-role">You</div>
+      <div class="bubble"></div>
+    </article>
+  </template>
+
+  <template id="tpl-assistant-message">
+    <article class="msg msg-assistant" tabindex="-1">
+      <div class="msg-role">
+        <span>Copilot</span>
+        <span class="badges"></span>
+      </div>
+      <div class="bubble">
+        <div class="answer"></div>
+        <ul class="notices" hidden></ul>
+        <div class="record-cards"></div>
+        <div class="followups" hidden></div>
+        <details class="evidence" hidden>
+          <summary><span class="evidence-label">Sources &amp; reasoning</span></summary>
+          <div class="evidence-body"></div>
+        </details>
+        <div class="msg-actions">
+          <div class="vote" role="group" aria-label="Was this answer useful?">
+            <button type="button" class="vote-btn" data-rating="up" aria-label="Helpful">👍</button>
+            <button type="button" class="vote-btn" data-rating="down" aria-label="Not helpful">👎</button>
+          </div>
+          <span class="vote-thanks" hidden></span>
+        </div>
+        <form class="feedback-form" hidden>
+          <fieldset>
+            <legend>What went wrong?</legend>
+            <div class="reasons"></div>
+            <label class="visually-hidden" for="">Additional detail</label>
+            <input type="text" class="feedback-comment" maxlength="2000"
+                   placeholder="Optional detail (no personal data, please)" />
+            <div class="feedback-actions">
+              <button type="submit" class="primary-btn small">Send feedback</button>
+              <button type="button" class="ghost-btn cancel-feedback">Cancel</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>

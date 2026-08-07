@@ -51,6 +51,17 @@ COVERAGE_WEIGHT = 0.6
 # into a tie, so a smaller constant is used to keep ranks discriminative.
 RRF_K = 10
 
+# Verbs and framing words people use to *ask*, which carry no topic. They are
+# excluded from the unknown-term check: warning that "summarize" is absent from
+# the handbook is noise, and noisy warnings train users to ignore real ones.
+INSTRUCTION_WORDS = frozenset(
+    """summarize summarise summary explain describe outline detail elaborate clarify
+    compare list show find give provide tell walk brief overview understand check
+    quick question answer help mean means anything something everything policy
+    policies document documents information info detail details company companys
+    company's ours ourselves regarding concerning about""".split()
+)
+
 STOP_WORDS = frozenset(
     """a about all am an and any are as at be been being but by can could did do does
     doing for from get give got had has have how i if in into is it its just know let
@@ -372,7 +383,11 @@ class KnowledgeIndex:
         the corpus at all, which is exactly the fact the employee needs to be
         told. Ranking alone cannot express that; vocabulary can.
         """
-        terms = [t for t in tokenize(query) if t not in STOP_WORDS and len(t) > 3]
+        terms = [
+            t
+            for t in tokenize(query)
+            if t not in STOP_WORDS and t not in INSTRUCTION_WORDS and len(t) > 3
+        ]
         return [t for t in dict.fromkeys(terms) if t not in self.bm25.idf]
 
     # -- introspection ----------------------------------------------------

@@ -79,6 +79,26 @@ async def corpus(index: KnowledgeIndex = Depends(get_index)) -> dict:
     }
 
 
+@router.get("/directory")
+async def directory(request: Request) -> list[dict]:
+    """Public directory entries, used by the demo's "acting as" selector.
+
+    Returns only the fields the company directory publishes — the same subset
+    any employee can already see. No balances, pay, level or hire dates.
+    """
+    records = request.app.state.tools.records
+    return [
+        {
+            "employee_id": row["employee_id"],
+            "full_name": row["full_name"],
+            "job_title": row["job_title"],
+            "department": row["department"],
+            "location": row["location"],
+        }
+        for row in records.employees
+    ]
+
+
 @router.get("/documents/{doc_id}")
 async def document_detail(doc_id: str, index: KnowledgeIndex = Depends(get_index)) -> dict:
     """Full text of one policy, so a citation can be opened and read in context."""
