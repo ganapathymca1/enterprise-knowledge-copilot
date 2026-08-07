@@ -20,6 +20,44 @@ starts and answers with **no API key at all** — see [Quick start](#quick-start
 
 ---
 
+## Screenshots
+
+Captured from the app running locally on `http://localhost:8000` with a live
+model (`gpt-4o-mini`). All data shown is synthetic.
+
+**Answering from an employee's own records, together with the governing policy**
+
+The copilot calls `get_leave_balance`, renders the raw record as a card so the
+figure is auditable, and explains it with the carry-over rule — every claim
+cited. Note the balance is correctly pro-rated for a 0.6 FTE employee.
+
+![Record lookup combined with policy](docs/screenshots/02-record-lookup.png)
+
+**Explainability: every answer opens up**
+
+Each retrieved passage with its document id, version, effective date, owning
+team and relevance score; the tools that ran; the search query actually used
+after rewriting; per-stage timings; and the trace id.
+
+![Sources and reasoning panel](docs/screenshots/03-sources-and-reasoning.png)
+
+**Declining, instead of guessing**
+
+There is no relocation policy in the knowledge base. Rather than answering from
+the neighbouring compensation text, the copilot declines, names the teams to
+contact, and lists what it does cover.
+
+![Abstention on an unsupported question](docs/screenshots/04-abstention.png)
+
+**Landing state**
+
+The sidebar publishes the full corpus the copilot can answer from — the
+boundary is visible before you ask.
+
+![Welcome screen](docs/screenshots/01-welcome.png)
+
+---
+
 ## Contents
 
 | What you want | Where |
