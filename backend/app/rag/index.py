@@ -363,6 +363,18 @@ class KnowledgeIndex:
             selected.append(remaining.pop(best_pos))
         return selected
 
+    def unknown_terms(self, query: str) -> list[str]:
+        """Content words from the query that appear nowhere in the corpus.
+
+        A strong, cheap over-trust signal. "What is the relocation bonus?"
+        retrieves the compensation policy with a respectable similarity score,
+        because *bonus* is well represented — but *relocation* does not exist in
+        the corpus at all, which is exactly the fact the employee needs to be
+        told. Ranking alone cannot express that; vocabulary can.
+        """
+        terms = [t for t in tokenize(query) if t not in STOP_WORDS and len(t) > 3]
+        return [t for t in dict.fromkeys(terms) if t not in self.bm25.idf]
+
     # -- introspection ----------------------------------------------------
     @property
     def stats(self) -> dict[str, object]:

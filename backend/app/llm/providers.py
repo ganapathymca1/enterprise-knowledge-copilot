@@ -316,13 +316,22 @@ class ExtractiveClient:
         prompt = "\n\n".join(m.content for m in messages if m.role == "user")
         question = _last_question(prompt)
         blocks = _parse_context_blocks(prompt)
-        if not blocks:
-            text = (
+        tool_section = _parse_tool_results(prompt)
+
+        parts: list[str] = []
+        if tool_section:
+            # Record data is exact and already scoped to the requester, so it
+            # leads the answer rather than being buried under policy quotes.
+            parts.append(f"From your HR records:\n\n{tool_section}")
+        if blocks:
+            heading = "What the policy says:" if tool_section else "Based on the retrieved policy text:"
+            parts.append(f"{heading}\n\n{_extract_answer(question, blocks)}")
+        if not parts:
+            parts.append(
                 "I could not find anything in the knowledge base that answers "
                 "that. Try rephrasing, or contact People Operations."
             )
-        else:
-            text = _extract_answer(question, blocks)
+        text = "\n\n".join(parts)
         return LLMResult(
             text=text,
             provider=self.name,
@@ -347,15 +356,40 @@ def _last_question(prompt: str) -> str:
     return matches[-1].strip() if matches else prompt.strip()[-300:]
 
 
+TRAILER_RE = re.compile(r"\n(?:Question:|CONVERSATION SO FAR|Write the grounded answer)", re.M)
+
+
 def _parse_context_blocks(prompt: str) -> list[tuple[int, str, str]]:
-    return [
-        (int(marker), title.strip(), body.strip())
-        for marker, title, body in CONTEXT_BLOCK_RE.findall(prompt)
-    ]
+    """Extract the numbered SOURCES blocks, and only those.
+
+    The final block runs to the end of the prompt, which would otherwise swallow
+    the question and the closing instruction and let them be quoted back as if
+    they were policy text.
+    """
+    sources_start = prompt.find("SOURCES")
+    region = prompt[sources_start:] if sources_start >= 0 else prompt
+    blocks: list[tuple[int, str, str]] = []
+    for marker, title, body in CONTEXT_BLOCK_RE.findall(region):
+        trailer = TRAILER_RE.search(body)
+        if trailer:
+            body = body[: trailer.start()]
+        blocks.append((int(marker), title.strip(), body.strip()))
+    return blocks
 
 
 def _tokens(text: str) -> set[str]:
     return {word for word in re.findall(r"[a-z0-9]+", text.lower()) if len(word) > 2}
+
+
+def _parse_tool_results(prompt: str) -> str:
+    """Pull the TOOL RESULTS section (already grounded, already scoped) out."""
+    start = prompt.find("TOOL RESULTS")
+    if start < 0:
+        return ""
+    end = prompt.find("SOURCES", start)
+    section = prompt[start : end if end > 0 else len(prompt)]
+    lines = section.splitlines()[1:]  # drop the header line
+    return "\n".join(line for line in lines if line.strip()).strip()
 
 
 def _extract_answer(question: str, blocks: list[tuple[int, str, str]]) -> str:
@@ -389,22 +423,63 @@ def _extract_answer(question: str, blocks: list[tuple[int, str, str]]) -> str:
         lines.append(f"- {sentence} [{marker}]")
         if len(lines) >= 5:
             break
-    return "Based on the retrieved policy text:\n\n" + "\n".join(lines)
+    return "\n".join(lines)
+
+
+LIST_ITEM_RE = re.compile(r"^\s*(?:[-*+]\s+|\d+\.\s+)")
 
 
 def _candidate_sentences(body: str) -> list[str]:
-    sentences: list[str] = []
+    """Turn a markdown block into whole, quotable sentences.
+
+    Source documents are hard-wrapped, so splitting on physical lines yields
+    fragments like "not reduce the annual leave balance." Paragraph lines are
+    therefore unwrapped first; list items and table rows stay as their own
+    units because they are already self-contained.
+    """
+    units: list[str] = []
+    paragraph: list[str] = []
+    in_list_item = False
+
+    def flush() -> None:
+        nonlocal in_list_item
+        if paragraph:
+            units.append(" ".join(paragraph).strip())
+            paragraph.clear()
+        in_list_item = False
+
     for line in body.splitlines():
-        stripped = line.strip().lstrip("-*# ").strip()
-        if len(stripped) < 25:
+        stripped = line.strip()
+        if not stripped:
+            flush()
             continue
         if stripped.startswith("|"):
-            # Flatten a markdown table row into readable prose.
+            flush()
             cells = [c.strip() for c in stripped.strip("|").split("|") if c.strip()]
             if len(cells) >= 2 and not set("".join(cells)) <= set("-: "):
-                sentences.append(": ".join(cells) + ".")
+                units.append(": ".join(cells) + ".")
             continue
-        sentences.extend(s for s in SENTENCE_RE.split(stripped) if len(s) > 25)
+        if stripped.startswith("#"):
+            flush()
+            continue
+        if LIST_ITEM_RE.match(line):
+            flush()
+            units.append(LIST_ITEM_RE.sub("", line).strip())
+            in_list_item = True
+            continue
+        if in_list_item and line.startswith(("  ", "\t")):
+            # Wrapped continuation of the bullet above.
+            units[-1] = f"{units[-1]} {stripped}".strip()
+            continue
+        paragraph.append(stripped)
+    flush()
+
+    sentences: list[str] = []
+    for unit in units:
+        for sentence in SENTENCE_RE.split(unit):
+            sentence = sentence.strip()
+            if 25 < len(sentence) <= 320:
+                sentences.append(sentence)
     return sentences
 
 
