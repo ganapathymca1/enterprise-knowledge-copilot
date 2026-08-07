@@ -67,6 +67,12 @@ MEDIUM_RELEVANCE = 0.28
 HIGH_GROUNDING = 0.80
 MEDIUM_GROUNDING = 0.55
 
+# Query-coverage bands used with the unknown-vocabulary check. Calibrated on
+# the evaluation set, where unsupported questions score at or below 0.16 and
+# answerable ones at or above 0.19 (see docs/ACCURACY_AND_LIMITATIONS.md).
+ABSTAIN_COVERAGE = 0.20
+CAUTION_COVERAGE = 0.30
+
 DEGRADED_NOTICE = (
     "The configured language model was unavailable, so this answer was produced "
     "by the offline fallback, which quotes the policy text directly instead of "
@@ -165,19 +171,19 @@ class Orchestrator:
         if not context.scored and not tool_succeeded:
             return await self._finalise_abstention(context, started)
 
-        # Vocabulary check: words the corpus has never seen are the clearest
-        # signal that a fluent-looking answer may be about the wrong thing.
+        # Vocabulary check. Words the corpus has never seen are the clearest
+        # signal that a fluent-looking answer may be about the wrong thing —
+        # "what is the relocation bonus?" retrieves the compensation policy with
+        # a healthy similarity score while the corpus has no relocation policy
+        # at all. Two thresholds, because the right response is graded: refuse
+        # when the question is mostly unfamiliar, caution when it is partly so.
         context.unknown_terms = self.index.unknown_terms(context.rewritten)
+        top_coverage = max((item.coverage for item in context.scored), default=0.0)
         if context.unknown_terms and not tool_succeeded:
-            context.notices.append(
-                "The term"
-                + ("s " if len(context.unknown_terms) > 1 else " ")
-                + ", ".join(f"'{term}'" for term in context.unknown_terms[:3])
-                + (" do" if len(context.unknown_terms) > 1 else " does")
-                + " not appear anywhere in the knowledge base. There may be no policy "
-                "covering this — treat the answer below as related material, not as an "
-                "answer to that specific term."
-            )
+            if top_coverage < ABSTAIN_COVERAGE:
+                return await self._finalise_abstention(context, started)
+            if top_coverage < CAUTION_COVERAGE:
+                context.notices.append(_unknown_terms_notice(context.unknown_terms))
 
         # 5. Generation ---------------------------------------------------
         stage = time.perf_counter()
@@ -473,11 +479,21 @@ class Orchestrator:
         is" impossible.
         """
         topics = sorted({document.title for document in self.index.documents})[:6]
+        if context.unknown_terms:
+            listed = ", ".join(f"**{term}**" for term in context.unknown_terms[:3])
+            gap = (
+                f"Nothing in the published policies mentions {listed}, so I have no "
+                "grounded source to answer from.\n\n"
+            )
+        else:
+            gap = (
+                "I only answer from Northwind Systems' published policy documents, and "
+                "nothing in them matched your question closely enough for me to give you "
+                "a reliable answer.\n\n"
+            )
         answer = (
             f"{ABSTAIN_SENTENCE}\n\n"
-            "I only answer from Northwind Systems' published policy documents, and "
-            "nothing in them matched your question closely enough for me to give you a "
-            "reliable answer.\n\n"
+            f"{gap}"
             "You could try naming the policy area directly, or contact People Operations "
             "(people-ops@northwind-example.com) if it is an HR question, IT ServiceDesk "
             "for tooling, or Information Security for anything security related.\n\n"
@@ -508,6 +524,16 @@ _REFUSAL_FOLLOWUPS = {
     "immigration": ["Can I work from another country temporarily?"],
     "legal": ["What is the appeal process for a grievance outcome?"],
 }
+
+
+def _unknown_terms_notice(terms: list[str]) -> str:
+    plural = len(terms) > 1
+    listed = ", ".join(f"'{term}'" for term in terms[:3])
+    return (
+        f"The term{'s' if plural else ''} {listed} {'do' if plural else 'does'} not appear "
+        "anywhere in the knowledge base. There may be no policy covering this — treat the "
+        "answer below as related material rather than an answer to that specific point."
+    )
 
 
 def _ms(started: float) -> int:

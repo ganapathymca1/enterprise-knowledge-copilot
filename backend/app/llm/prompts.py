@@ -71,6 +71,17 @@ short bullets. Keep it under 200 words unless the question genuinely needs a pro
 sources over vague summaries.
 11. Plain markdown only: short paragraphs, bullets, and bold for key numbers. No headings, \
 no preamble like "Certainly" and no restatement of the question.
+
+CITATION FORMAT — put the marker at the end of every line that states a fact, before the \
+full stop. Follow this shape exactly:
+
+Full-time employees get **24 days** of paid annual leave per calendar year [1].
+
+- Up to **5 unused days** carry over, and they expire on **31 March** [1].
+- Requests of 10 days or more need **20 working days** of notice [2].
+
+A line with a number, a date, a threshold or a named process and no marker is a defect, \
+even if the fact is obviously right.
 """.format(abstain=ABSTAIN_SENTENCE)
 
 
