@@ -1,0 +1,25 @@
+employee_id,full_name,work_email,department,job_title,level,location,country,timezone,employment_type,work_pattern,hire_date,manager_id,status
+EMP-1001,Amara Okafor,amara.okafor@northwind-example.com,Engineering,Senior Software Engineer,L5,"Austin, US",US,America/Chicago,Part-time (0.6 FTE),Hybrid,2025-03-21,EMP-1023,Active
+EMP-1002,Priya Venkatesh,priya.venkatesh@northwind-example.com,Engineering,Software Engineer,L3,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Hybrid,2022-02-02,EMP-1023,Active
+EMP-1003,Diego Ramirez,diego.ramirez@northwind-example.com,Engineering,Staff Software Engineer,L6,"Austin, US",US,America/Chicago,Full-time,Fully remote,2025-01-28,EMP-1023,Active
+EMP-1004,Mei Chen,mei.chen@northwind-example.com,Engineering,Site Reliability Engineer,L4,"London, UK",UK,Europe/London,Full-time,Office-based,2020-09-24,EMP-1023,Active
+EMP-1005,Tomas Novak,tomas.novak@northwind-example.com,Engineering,Engineering Manager,L6,"London, UK",UK,Europe/London,Full-time,Hybrid,2020-02-10,EMP-1023,Active
+EMP-1006,Nadia Haddad,nadia.haddad@northwind-example.com,Data & AI,Machine Learning Engineer,L4,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Hybrid,2021-07-09,EMP-1008,Active
+EMP-1007,Kwame Mensah,kwame.mensah@northwind-example.com,Data & AI,Data Engineer,L4,"Austin, US",US,America/Chicago,Full-time,Fully remote,2022-01-12,EMP-1008,Active
+EMP-1008,Sofia Rossi,sofia.rossi@northwind-example.com,Data & AI,Head of Data & AI,L7,"Austin, US",US,America/Chicago,Full-time,Office-based,2021-03-14,,Active
+EMP-1009,Rahul Iyer,rahul.iyer@northwind-example.com,Product,Product Manager,L5,"London, UK",UK,Europe/London,Full-time,Hybrid,2023-02-19,EMP-1008,Active
+EMP-1010,Elena Petrova,elena.petrova@northwind-example.com,Product,Product Designer,L4,"Bengaluru, IN",IN,Asia/Kolkata,Part-time (0.6 FTE),Hybrid,2019-04-24,EMP-1008,Active
+EMP-1011,Yusuf Demir,yusuf.demir@northwind-example.com,People Operations,HR Business Partner,L4,"London, UK",UK,Europe/London,Full-time,Fully remote,2019-10-07,EMP-1012,Active
+EMP-1012,Hana Sato,hana.sato@northwind-example.com,People Operations,Head of People Operations,L7,"London, UK",UK,Europe/London,Full-time,Office-based,2020-10-30,EMP-1008,Active
+EMP-1013,Lucas Almeida,lucas.almeida@northwind-example.com,Finance,Finance Analyst,L3,"Austin, US",US,America/Chicago,Full-time,Hybrid,2025-04-13,EMP-1008,Active
+EMP-1014,Ingrid Larsen,ingrid.larsen@northwind-example.com,Finance,Finance Operations Lead,L5,"Austin, US",US,America/Chicago,Full-time,Hybrid,2023-12-12,EMP-1008,Active
+EMP-1015,Omar Farouk,omar.farouk@northwind-example.com,Customer Support,Support Engineer,L3,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Fully remote,2021-01-15,EMP-1008,Active
+EMP-1016,Aiko Tanaka,aiko.tanaka@northwind-example.com,Customer Support,Support Team Lead,L5,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Office-based,2025-01-21,EMP-1008,Active
+EMP-1017,Farida Nasser,farida.nasser@northwind-example.com,Information Security,Security Engineer,L5,"London, UK",UK,Europe/London,Full-time,Hybrid,2022-03-06,EMP-1008,Active
+EMP-1018,Niko Berg,niko.berg@northwind-example.com,Information Security,Security Duty Officer,L4,"Austin, US",US,America/Chicago,Full-time,Hybrid,2025-01-30,EMP-1008,Active
+EMP-1019,Beatriz Lima,beatriz.lima@northwind-example.com,Engineering,Senior Software Engineer,L5,"Austin, US",US,America/Chicago,Part-time (0.6 FTE),Fully remote,2022-12-06,EMP-1023,Active
+EMP-1020,Sanjay Kulkarni,sanjay.kulkarni@northwind-example.com,Engineering,Software Engineer,L3,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Office-based,2021-09-24,EMP-1023,Active
+EMP-1021,Clara Dubois,clara.dubois@northwind-example.com,Engineering,Staff Software Engineer,L6,"Austin, US",US,America/Chicago,Full-time,Hybrid,2021-09-05,EMP-1023,Active
+EMP-1022,Idris Bello,idris.bello@northwind-example.com,Engineering,Site Reliability Engineer,L4,"London, UK",UK,Europe/London,Full-time,Hybrid,2020-07-10,EMP-1023,Active
+EMP-1023,Lena Sorensen,lena.sorensen@northwind-example.com,Engineering,Engineering Manager,L6,"London, UK",UK,Europe/London,Full-time,Fully remote,2019-10-03,EMP-1008,Active
+EMP-1024,Ravi Menon,ravi.menon@northwind-example.com,Data & AI,Machine Learning Engineer,L4,"Bengaluru, IN",IN,Asia/Kolkata,Full-time,Office-based,2022-07-22,EMP-1008,Active
